@@ -170,7 +170,7 @@ stages:
     - group: 'Release'
   displayName: 'Apply database schema changes'
   dependsOn: DBAVerificationScript
-  condition: and(succeeded('DBAVerificationScript'), eq(variables['schemaChanged'], True))
+  condition: and(succeeded('DBAVerificationScript'), eq(variables['schemaChanged'], False))
   jobs:
   - deployment: DBAVerificationApply
     pool:
