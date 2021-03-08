@@ -154,7 +154,7 @@ stages:
                   $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
                   $varName = "schemaChanged"
                   $vars.$varName= @{}
-                  $vars.$varName.value = "True"
+                  $vars.$varName.value = "False"
                   $vars.$varName.isSecret = $false
                   $methodParameters = @{
                     id = $vg.id
