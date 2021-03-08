@@ -142,7 +142,7 @@ stages:
 
                 # Check for schema changes
                 $file = Get-Content "d:\a\1\s\GeneratedOutputFiles\$(databasename)_Script.sql"
-                $containsWord = $file | %{$_ -match "CREATE" -or $_ -match "DROP"}
+                $containsWord = $file | %{$_ -match "CREATE" -or $_ -match "ALTER" -or $_ -match "DROP"}
                 if ($containsWord -contains $true) {
                   Install-Module VSTeam -Scope CurrentUser -Force
                   Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
@@ -154,7 +154,7 @@ stages:
                   $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
                   $varName = "schemaChanged"
                   $vars.$varName= @{}
-                  $vars.$varName.value = "False"
+                  $vars.$varName.value = "True"
                   $vars.$varName.isSecret = $false
                   $methodParameters = @{
                     id = $vg.id
@@ -163,9 +163,8 @@ stages:
                     Description = ""
                     Type = "Vsts"
                     Variables = $vars}
-                  Update-VSTeamVariableGroup @methodParameters}
+                  Update-VSTeamVariableGroup @methodParameters} 
 
-                  
 - stage: DBAVerificationApply
   variables: 
     - group: 'Release'
@@ -256,6 +255,7 @@ stages:
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
   dependsOn: Dev
+  condition: succeeded('Dev')
   jobs:
   - deployment: Deploy
     pool:
@@ -279,6 +279,7 @@ stages:
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
   dependsOn: Test
+  condition: succeeded('Test')
   jobs:
   - deployment: Deploy
     pool:
